@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>NUI Input</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body {
+    width:100%; height:100%;
+    background:transparent;
+    font-family: "Segoe UI", Arial, sans-serif;
+    overflow:hidden;
+  }
+  body.demo-bg {
+    background: radial-gradient(circle at 25% 20%, #1e1240 0%, #100a24 45%, #05040c 100%);
+  }
+  #input-box {
+    position:absolute;
+    left: 50%;
+    top: 60%;
+    transform: translate(-50%, -50%);
+    width: 680px;
+    display:none;
+    background: linear-gradient(150deg, rgba(26,22,42,0.95), rgba(41,20,54,0.95));
+    border: 1px solid rgba(180,140,255,0.18);
+    border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 0 24px rgba(124,58,237,0.15);
+    overflow:hidden;
+  }
+  #input-box.visible { display:block; }
+  .header {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 2px solid;
+    border-image: linear-gradient(90deg, #7c3aed, #22d3ee) 1;
+  }
+  .icon {
+    width:22px; height:22px;
+    flex-shrink:0;
+  }
+  .icon svg { width:100%; height:100%; display:block; }
+  .icon svg rect[stroke] { stroke:#c9bbff; }
+  .icon svg rect[fill]:not([fill="none"]) { fill:#c9bbff; }
+  .title {
+    color:#f1eeff;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:0.3px;
+  }
+  .field { padding: 14px 16px; }
+  .field input {
+    width:100%;
+    background: transparent;
+    border:none;
+    outline:none;
+    color:#fff;
+    font-size:14px;
+    caret-color:#22d3ee;
+  }
+  .field input::placeholder { color: rgba(255,255,255,0.35); }
+</style>
+</head>
+<body>
+
+<div id="input-box">
+  <div class="header">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="#f2f2f2" stroke-width="1.6"/>
+        <rect x="4.5" y="7.7" width="2" height="2" fill="#f2f2f2"/>
+        <rect x="8" y="7.7" width="2" height="2" fill="#f2f2f2"/>
+        <rect x="11.5" y="7.7" width="2" height="2" fill="#f2f2f2"/>
+        <rect x="15" y="7.7" width="2" height="2" fill="#f2f2f2"/>
+        <rect x="18" y="7.7" width="1.5" height="2" fill="#f2f2f2"/>
+        <rect x="4.5" y="11.1" width="2" height="2" fill="#f2f2f2"/>
+        <rect x="8" y="11.1" width="2" height="2" fill="#f2f2f2"/>
+        <rect x="11.5" y="11.1" width="2" height="2" fill="#f2f2f2"/>
+        <rect x="15" y="11.1" width="2" height="2" fill="#f2f2f2"/>
+        <rect x="18" y="11.1" width="1.5" height="2" fill="#f2f2f2"/>
+        <rect x="6" y="14.5" width="12" height="2" fill="#f2f2f2"/>
+      </svg>
+    </div>
+    <div class="title" id="box-title">Choose Menu Key</div>
+  </div>
+  <div class="field">
+    <input id="box-input" type="text" autocomplete="off" placeholder="">
+  </div>
+</div>
+
+<script>
+(function () {
+  const box   = document.getElementById('input-box');
+  const input = document.getElementById('box-input');
+  const title = document.getElementById('box-title');
+
+  function resourceName() {
+    return (window.GetParentResourceName ? window.GetParentResourceName() : 'nui-input');
+  }
+
+  function post(endpoint, data) {
+    fetch(`https://${resourceName()}/${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+      body: JSON.stringify(data || {})
+    }).catch(() => {});
+  }
+
+  function open(t) {
+    title.textContent = t || 'Choose Menu Key';
+    input.value = '';
+    box.classList.add('visible');
+    setTimeout(() => input.focus(), 0);
+  }
+
+  function close() {
+    box.classList.remove('visible');
+    input.blur();
+  }
+
+  input.addEventListener('keydown', function (e) {
+    e.stopPropagation();
+    if (e.key === 'Enter') {
+      const value = input.value.trim();
+      close();
+      post('submit', { value });
+    } else if (e.key === 'Escape') {
+      close();
+      post('cancel', {});
+    }
+  });
+
+  window.addEventListener('message', function (e) {
+    const data = e.data || {};
+    if (data.action === 'open') open(data.title);
+    if (data.action === 'close') close();
+  });
+
+  // Démo autonome (hors FiveM) : fond dégradé + ouverture auto pour tester dans le navigateur
+  if (!window.GetParentResourceName) {
+    document.body.classList.add('demo-bg');
+    open('Choose Menu Key');
+  }
+})();
+</script>
+
+</body>
+</html>
