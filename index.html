@@ -11,9 +11,6 @@
     font-family: "Segoe UI", Arial, sans-serif;
     overflow:hidden;
   }
-  body.demo-bg {
-    background: radial-gradient(circle at 25% 20%, #1e1240 0%, #100a24 45%, #05040c 100%);
-  }
   #input-box {
     position:absolute;
     left: 50%;
@@ -21,10 +18,10 @@
     transform: translate(-50%, -50%);
     width: 680px;
     display:none;
-    background: linear-gradient(150deg, rgba(26,22,42,0.95), rgba(41,20,54,0.95));
-    border: 1px solid rgba(180,140,255,0.18);
+    background: linear-gradient(150deg, rgba(14,26,48,0.97), rgba(18,38,66,0.97));
+    border: 1px solid rgba(120,170,255,0.25);
     border-radius: 10px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 0 24px rgba(124,58,237,0.15);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55);
     overflow:hidden;
   }
   #input-box.visible { display:block; }
@@ -35,15 +32,15 @@
     padding: 12px 16px;
     background: rgba(255,255,255,0.03);
     border-bottom: 2px solid;
-    border-image: linear-gradient(90deg, #7c3aed, #22d3ee) 1;
+    border-image: linear-gradient(90deg, #3a7bd5, #22d3ee) 1;
   }
   .icon {
     width:22px; height:22px;
     flex-shrink:0;
   }
   .icon svg { width:100%; height:100%; display:block; }
-  .icon svg rect[stroke] { stroke:#c9bbff; }
-  .icon svg rect[fill]:not([fill="none"]) { fill:#c9bbff; }
+  .icon svg rect[stroke] { stroke:#bcd9ff; }
+  .icon svg rect[fill]:not([fill="none"]) { fill:#bcd9ff; }
   .title {
     color:#f1eeff;
     font-size:14px;
@@ -138,9 +135,8 @@
     if (data.action === 'close') close();
   });
 
-  // Démo autonome (hors FiveM) : fond dégradé + ouverture auto pour tester dans le navigateur
+  // Démo autonome (hors FiveM) : ouverture auto pour tester dans le navigateur
   if (!window.GetParentResourceName) {
-    document.body.classList.add('demo-bg');
     open('Choose Menu Key');
   }
 })();
