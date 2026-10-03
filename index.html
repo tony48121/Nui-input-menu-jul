@@ -28,11 +28,18 @@ function tr(el,{kind,dur,start=.94,x=0,y=0,base=''},out){
 }
 function present(s,show,build,plan){
   if(show){
-    if(s.els){if(s.out){s.anims.forEach(a=>a.reverse());s.out=false;s.g++}return}
-    s.els=build();s.out=false;s.anims=plan(s.els,false);
+    if(s.els){if(s.out){(s.anims||[]).forEach(a=>a&&a.reverse());s.out=false;s.g++}return}
+    s.els=(typeof build==='function')?build():s.els;
+    s.out=false;s.anims=(typeof plan==='function')?plan(s.els,false):[];
   }else if(s.els&&!s.out){
-    const els=s.els,g=++s.g;s.out=true;s.anims=plan(els,true);
-    Promise.all(s.anims.map(a=>a.finished)).then(()=>{if(s.g===g){els.forEach(e=>e.remove());s.els=null;s.out=false}}).catch(()=>{});
+    const els=s.els,g=++s.g;s.out=true;
+    /* plan peut manquer (appel a 2 arguments) : on ne doit JAMAIS lever,
+       sinon s.out reste bloque true et le panneau n'est jamais retire. */
+    s.anims=(typeof plan==='function')?plan(els,true):[];
+    const done=()=>{if(s.g===g){els.forEach(e=>e.remove());s.els=null;s.out=false}};
+    /* .then(done,done) : nettoyage aussi si une animation est annulee
+       (avant : .catch(()=>{}) laissait l'etat bloque "out" a jamais). */
+    Promise.all(s.anims.map(a=>a&&a.finished)).then(done,done);
   }
 }
 
